@@ -25,6 +25,6 @@ else
   fi
 fi
 
-chown -R $TARGET_UID:$TARGET_UID /home/claude
+chown -R $TARGET_UID:$TARGET_GID /home/claude
 chmod 777 /usr/bin/claude
 exec gosu claude "$@"
