@@ -13,8 +13,11 @@ Run Claude Code safely in a containerized environment.
     - your Claude credentials, to avoid re-auth on every run
     ```shell
     docker run -it \
-      -v $PWD:/app \
-      -v $HOME/.claude.json:/home/claude/.claude.json \
-      claude-code claude
+        -v $HOME/.claude.json:/home/claude/.claude.json \
+        -v $HOME/.claude/:/home/claude/.claude/ \
+        -v $PWD/pyproject.toml:/app/pyproject.toml \
+        -v $PWD/uv.lock:/app/uv.lock \
+        -v $PWD/my-code-dir:/app/my-code-dir \ # <-- replace with your code dir
+        claude-code \
+        bash -c 'claude --dangerously-skip-permissions'
     ```
-    The `~/.claude` mount reuses your existing authentication so you don't have to log in on every run.
