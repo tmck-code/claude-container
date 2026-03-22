@@ -18,20 +18,20 @@ COPY --from=uv /uv /uvx /usr/local/bin/
 # use the system Python interpreter; don't let uv download its own
 ENV UV_PYTHON_DOWNLOADS=never
 
-# install claude code (native binary, available to all users via /usr/local/bin/claude)
-RUN curl -fsSL https://claude.ai/install.sh | bash \
-    && if ! [ -f /usr/local/bin/claude ]; then \
-        find /root/.claude -name "claude" -type f -perm /111 2>/dev/null \
-            | head -1 \
-            | xargs -I{} install -m 755 {} /usr/local/bin/claude; \
-    fi
-
 RUN groupadd --system --gid 999 claude \
     && useradd --system \
         --gid 999 --uid 999 \
         --create-home --shell \
         /bin/bash \
         claude
+
+WORKDIR /home/claude
+
+# install claude code (native binary, available to all users via /usr/local/bin/claude)
+RUN curl -fsSL https://claude.ai/install.sh | bash
+RUN cp -RvP /root/.local . \
+    && chown -R claude:claude .local \
+    && cp /home/claude/.local/bin/claude /usr/bin/claude
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh

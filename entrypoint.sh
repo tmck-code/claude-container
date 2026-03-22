@@ -14,10 +14,17 @@ if [ "$TARGET_UID" -eq 0 ]; then
   TARGET_UID=$CURRENT_UID
   TARGET_GID=$CURRENT_GID
 else
-  [ "$TARGET_GID" -ne "$CURRENT_GID" ] && groupmod --gid "$TARGET_GID" claude
+  if [ "$TARGET_GID" -ne "$CURRENT_GID" ]; then
+    echo "[entrypoint] Changing claude's GID from $CURRENT_GID to $TARGET_GID" >&2
+    groupmod --gid "$TARGET_GID" claude
+  fi
   # --non-unique allows reusing a UID already present in /etc/passwd
-  [ "$TARGET_UID" -ne "$CURRENT_UID" ] && usermod --uid "$TARGET_UID" --non-unique claude
+  if [ "$TARGET_UID" -ne "$CURRENT_UID" ]; then
+    echo "[entrypoint] Changing claude's UID from $CURRENT_UID to $TARGET_UID" >&2
+    usermod --uid "$TARGET_UID" --non-unique claude
+  fi
 fi
 
-chown -R claude:claude /home/claude
+chown -R $TARGET_UID:$TARGET_UID /home/claude
+chmod 777 /usr/bin/claude
 exec gosu claude "$@"
