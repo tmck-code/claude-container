@@ -18,9 +18,9 @@ COPY --from=uv /uv /uvx /usr/local/bin/
 # use the system Python interpreter; don't let uv download its own
 ENV UV_PYTHON_DOWNLOADS=never
 
-RUN groupadd --system --gid 999 claude \
+RUN groupadd --system --gid 1000 claude \
     && useradd --system \
-        --gid 999 --uid 999 \
+        --gid 1000 --uid 1000 \
         --create-home --shell \
         /bin/bash \
         claude
@@ -36,8 +36,9 @@ RUN cp -RvP /root/.local . \
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
+USER claude
 WORKDIR /app
 
 # this file maps the host UID/GID to the claude user before dropping privileges
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+# ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
