@@ -5,7 +5,7 @@ description = "Docker image for Claude Code"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-  "awscli",
+  "awscli @ git+https://github.com/aws/aws-cli.git@v2",
   "mypy",
   "ruff",
   "uv",
