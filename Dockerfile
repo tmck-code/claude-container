@@ -51,6 +51,18 @@ RUN cp -RvP /root/.local . \
     && cp /home/claude/.local/bin/claude /usr/bin/claude \
     && echo 'export PATH="$HOME/.local/bin:$PATH"' >> /home/claude/.bashrc
 
+WORKDIR /uv
+
+# Install dependencies (with cache mount for better performance)
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync
+
+# Place executables at front of path, otherwise no uv-installed packages will be found
+ENV PATH="/uv/.venv/bin:$PATH"
+
 USER claude
 WORKDIR /app
-
+USER claude
+WORKDIR /app
